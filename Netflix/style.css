@@ -1,0 +1,96 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    background: #000;
+}
+
+header {
+    height: 1200px;
+    background-size: max(100vw, 2844.44px);
+    background-position: center top;
+    background-repeat: no-repeat;
+
+}
+
+header .bg {
+    position: absolute;
+    left: 50%;
+    translate: -50%;
+    max-width: 1920px;
+    border: 3px solid rgba(255, 0, 0, 0.741);
+    box-shadow: 0px 0px 300px rgba(248, 45, 45, 0.516);
+}
+
+header .overlayBox {
+
+    display: flex;
+    box-sizing: border-box;
+    background-color: #00000091;
+    box-shadow: 0px 0px 300px rgb(0, 0, 0);
+    width: 1920px;
+    margin: 0px auto;
+    padding: 40px;
+    justify-content: space-between;
+}
+
+.nav-buttons {
+
+    display: flex;
+    align-items: center;
+
+}
+
+header nav {
+    position: relative;
+    display: flex;
+    height: 70px;
+    max-width: 95vw;
+    justify-content: space-between;
+    margin: auto;
+    align-items: center;
+
+}
+
+.logo {
+    content: url(assets/image/logo.svg);
+    height: 40px;
+
+}
+
+.language {
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 20px;
+    font-weight: bold;
+    background-color: black;
+    padding: 1px 10px;
+    color: white;
+}
+
+.signin {
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 10px;
+    background-color: rgb(244, 62, 62);
+    color: rgb(255, 255, 255);
+}
+
+main {
+    background-color: #131313;
+    height: 100vh;
+}
+.trending{
+    display: flex;
+    height: 400px;
+    margin: 0px 100px;
+    margin-top: 20px;
+}
+.card{
+    background: #000;
+    width: 100px;
+    border: 1px solid #000;
+    color: white;
+    width: 100%;
+}
