@@ -6,46 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Tic Tac Toe</title>
-    <script src="script.js"></script>
 </head>
 
 <body>
 
     <p>Tic Tac Toe</p>
+    <div class="details">
+
+        <div class="score">O <span id="scoreO">-</span></div>
+        <p class="score" id="turn">O</p>
+        <div class="score">X <span id="scoreX">-</span></div>
+
+    </div>
     <div class="board">
         <div class="row">
 
-            <button class="space">X</button>
-            <button class="space">O</button>
-            <button class="space">X</button>
-            
-        </div>
-        <div class="row">
-
-            <button class="space">X</button>
-            <button class="space">O</button>
-            <button class="space">X</button>
+            <button class="space"></button>
+            <button class="space"></button>
+            <button class="space"></button>
 
         </div>
         <div class="row">
 
-            <button class="space">X</button>
-            <button class="space">O</button>
-            <button class="space">X</button>
+            <button class="space"></button>
+            <button class="space"></button>
+            <button class="space"></button>
 
         </div>
-       
+        <div class="row">
 
+            <button class="space"></button>
+            <button class="space"></button>
+            <button class="space"></button>
+
+        </div>
+
+        <div id="gameover">
+            <p id="winner"></p>
+            <button id="playagain">Play Again</button>
+        </div>
     </div>
-    <div class="action">
-        <p>Player 1 - O</p>
-        <p>Player 2 - X</p>
-        <p>Status - Ongoing</p>
-    </div>
+    <button id="restart">Restart</button>
+
 
 
 
 
 </body>
+<script src="script.js"></script>
+
+
 
 </html>
