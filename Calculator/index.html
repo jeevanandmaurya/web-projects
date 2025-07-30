@@ -6,63 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>
 </head>
 
 <body>
 
     <div class="display-section">
-        <div class="result">
-            Ans = 30
-        </div>
-        <div class="expression">
-            10 + 20
+        <div id="display" contenteditable="false">
+
+            <p id="expression" contenteditable="false">19999+1</p>
+            <p id="result" contenteditable="false">
+                200000
+            </p>
         </div>
     </div>
     <div class="button-section">
-        <div class="extras">
-            <button class="symbols" >Rad</button>
-            <button class="symbols" >Deg</button>
-            <button class="symbols">x! </button>
-            <button class="symbols">Inv </button>
-            <button class="symbols">sin </button>
-            <button class="symbols">ln </button>
-            <button class="symbols">&pi; </button>
-            <button class="symbols">cos </button>
-            <button class="symbols">log </button>
-            <button class="symbols">e </button>
-            <button class="symbols">tan </button>
-            <button class="symbols">&radic; </button>
-            <button class="symbols">Ans </button>
-            <button class="symbols">EXP </button>
-            <button class="symbols">x<sup>y</sup> </button>
-        </div>
-        <div class="basic">
-            <button class="symbols">(</button>
-            <button class="symbols">)</button>
-            <button class="symbols">%</button>
-            <button class="symbols">CE</button>
-            <button class="numbers">7</button>
-            <button class="numbers">8</button>
-            <button class="numbers">9</button>
-            <button class="symbols">&divide;</button>
-            <button class="numbers">4</button>
-            <button class="numbers">5</button>
-            <button class="numbers">6</button>
-            <button class="symbols">&times;</button>
-            <button class="numbers">1</button>
-            <button class="numbers">2</button>
-            <button class="numbers">3</button>
-            <button class="symbols">-</button>
-            <button class="numbers">0</button>
-            <button class="symbols">.</button>
-            <button class="symbols" id="equal">=</button>
-            <button class="symbols">+</button>
+        <button class="symbols" id="allClear">AC</button>
+        <button class="symbols" id="openParenthesis">(</button>
+        <button class="symbols" id="closeParenthesis">)</button>
+        <button class="symbols" id="clear">&#10006;</button>
 
-        </div>
+        <button class="numbers">7</button>
+        <button class="numbers">8</button>
+        <button class="numbers">9</button>
+        <button class="operators">/</button>
+
+        <button class="numbers">4</button>
+        <button class="numbers">5</button>
+        <button class="numbers">6</button>
+        <button class="operators">*</button>
+
+        <button class="numbers">1</button>
+        <button class="numbers">2</button>
+        <button class="numbers">3</button>
+        <button class="operators">-</button>
+
+        <button class="numbers">0</button>
+        <button class="numbers">.</button>
+        <button class="symbols" id="equal">=</button>
+        <button class="operators">+</button>
 
     </div>
 
+    <script src="script.js"></script>
 </body>
 
 </html>
