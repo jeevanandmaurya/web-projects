@@ -1,0 +1,15 @@
+| Feature                            | Why It Matters                                    |
+| ---------------------------------- | ------------------------------------------------- |
+| **Multiline Text Input**           | Allows long prompts, code, or formulas.           |
+| **LLM Response Display**           | Shows AI output in readable format.               |
+| **Streaming Output**               | Simulates real-time typing; improves UX.          |
+| **Conversation History (Sidebar)** | Like ChatGPT, enables chat continuity.            |
+| **Auto-scroll to Latest Message**  | Keeps the view locked on new replies.             |
+| **Markdown + Code Formatting**     | Many AI replies contain formatted content.        |
+| **LaTeX Support (MathJax/KaTeX)**  | Essential for rendering math/scientific formulas. |
+| **Retry / Regenerate Response**    | UX staple to redo the last message.               |
+| **Clear Chat Button**              | Starts a fresh conversation.                      |
+| **Loading Indicator (Typing...)**  | Gives feedback that AI is responding.             |
+| **Dark / Light Mode Toggle**       | Modern, user-friendly theme control.              |
+| **Copy Button on Code Blocks**     | One-click copying for devs and students.          |
+| **Attachments Placeholder**        | Prepares for future support (e.g., PDFs, images). |
