@@ -1,14 +1,13 @@
 #root {
   display: flex;
   justify-content: center;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   align-content: center;
-  justify-content: center;
   border-right: 1px solid rgba(255, 255, 255, 0.123);
 }
 
@@ -55,7 +54,7 @@
   flex-direction: column;
   /* align-items: center; */
   width: 80vw;
-  height: 100%;
+  /* height: 100%; */
   border: 1px solid rgba(255, 255, 255, 0.182);
   border-radius: 20px;
 }

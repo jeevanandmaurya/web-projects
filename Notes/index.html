@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav>
+        <button id="sidebarToggle">></button>
+        <h1 id="titleBar">Notes</h1>
+        <div id="search"><input type="text" value="" placeholder="Search" id="searchInput"></div>
+        <img id="themeToggle" src="Assests/dark-theme.svg" alt="theme">
+    </nav>
+    <div class="mainBody">
+        <div class="sidebar">
+            <div id="notes" class="menu-item active">
+                <img src="Assests/notes.svg" alt="">
+                <span>Notes</span>
+            </div>
+            <div id="trash" class="menu-item">
+                <img src="Assests/bin.svg" alt="">
+                <span>Trash</span>
+            </div>
+        </div>
+        <div class="main dashboard">
+            <!-- Note List -->
+            <div class="noteList">
+
+                <div class="notesContainer">
+                    <div class="noteCard newNote">
+                        <h2>+ New Note </h2>
+                    </div>
+                    <!-- <div class="noteCard">
+                        <h3>Note Title</h3>
+                        <p>This is a sample note content. It can be multiple lines long and contain various information.</p>
+                        <div class="noteActions">
+                            <button class="editBtn">Edit</button>
+                            <button class="deleteBtn">Delete</button>
+                        </div>
+                    </div> -->
+
+                </div>
+            </div>
+            <!-- NoteEditor -->
+            <div class="noteEditor" noteId="" style="display: none;">
+                <div id="editorActions">
+                    <button id="datetime"></button>
+                    <!-- <div id="undoredo" >
+                        <span>↶</span>
+                        <span>↷</span>
+                    </div> -->
+                    <div>
+                        <button class="saveBtn">Save</button>
+                        <button class="deleteBtn">Delete</button>
+                        <button class="closeBtn">Close</button>
+                    </div>
+                </div>
+                <textarea id="noteTitle" placeholder="Title"></textarea>
+                <textarea id="noteContent" placeholder="Start writing your note here..."></textarea>
+            </div>
+            <!-- Overlay Warning -->
+            <div class="overlayContainer" style="display: none;">
+                <div class="overlay deleteWarning" style="display: none;">
+                    <h3>Are you sure you want to delete this note?</h3>
+                    <div class="confirmationBtns">
+                        <button class="confirmDelete">Yes</button>
+                        <button class="cancelDelete">No</button>
+                    </div>
+                </div>
+                <div class="overlay closeWarning" style="display: none;">
+                    <h3>Do you want to save before closing?</h3>
+                    <div class="confirmationBtns">
+                        <button class="saveAndClose">Save & Close</button>
+                        <button class="discardAndClose">Discard & Close</button>
+                        <button class="cancelClose">Cancel</button>
+                    </div>
+                </div>
+                <div class="overlay savedMessage" style="display: none;">
+                    <p>Saved</p>
+                </div>
+                <div class="overlay-background"></div>
+            </div>
+        </div>
+        <div class="trash sidebarItem" style="display: none;">
+            <div class="trashActions">
+                <button class="emptyTrashBtn">Empty Trash</button>
+                <button class="restoreAllBtn">Restore All</button>
+            </div>
+            <div class="trashContainer">
+                <!-- <div class="trashCard">
+                    <h3>Deleted Note Title</h3>
+                    <p>This is a sample deleted note content. It can be multiple lines long and contain various information.</p>
+                    <div class="noteActions">
+                        <button class="restoreBtn">Restore</button>
+                        <button class="permanentDeleteBtn">Delete Permanently</button>
+                    </div>
+                </div> -->
+            </div>
+            <div class="overlayContainer" style="display: none;">
+                <div class="overlay dynamic-overlay" style="display: none;"></div>
+            </div>
+        </div>
+
+</body>
+<script type="module" src="script.js"></script>
+
+</html>

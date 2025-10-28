@@ -1,0 +1,428 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+:root {
+    --bg: #ffffff;
+    --bg-2: rgb(60, 60, 60);
+    --bg-3: rgb(240, 240, 240);
+    --menu-item-bg: rgb(132, 214, 194);
+    --menu-item-bg-hover: rgb(184, 226, 216);
+    --border: rgba(0, 0, 0, 0.250);
+    --text: #000;
+    --inv-text: #ffffff;
+    --bgdt: white;
+}
+
+.dark-theme {
+    --bg: #252525;
+    --bg-2: rgb(195, 195, 195);
+    --bg-3: rgb(80, 80, 80);
+    --menu-item-bg: rgb(16, 121, 97);
+    --menu-item-bg-hover: rgb(46, 56, 54);
+    --border: rgba(255, 255, 255, 0.15);
+    --text: #f5f5f5;
+    --inv-text: #000000;
+    --bgdt: rgb(50, 50, 50);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+#sidebarToggle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    border-radius:10px;
+    background: transparent;
+    border:none;
+    color: var(--text);
+    cursor: pointer;
+}
+
+#titleBar {
+    /* padding: 10px; */
+    font-size: 32px;
+    font-weight: 400;
+    margin: auto 10px auto 0px;
+}
+
+#search {
+    /* border: 1px solid var(--border); */
+    margin: auto auto auto 0px;
+
+
+}
+
+#searchInput {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 20vw;
+    padding: 10px 15px;
+
+}
+
+#themeToggle {
+    border-radius: 20px;
+    margin: auto 20px auto 0px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.dark-theme #themeToggle {
+    filter: invert(1);
+}
+
+.dark-theme .sidebar>div>img {
+    filter: invert(1);
+}
+
+.dark-theme #pin {
+    filter: invert(1);
+}
+
+.mainBody {
+    display: flex;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 15%;
+    padding: 10px;
+    border-right: 1px solid var(--border);
+}
+
+body.sidebar-hide .sidebar {
+    display: none;
+}
+
+.main {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.noteList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    /* border: 1px solid var(--border);
+    margin: 5px; */
+    overflow: auto;
+}
+
+.notesContainer {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-gap: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.noteEditor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border);
+}
+
+.noteEditor>textarea#noteTitle {
+    height: 5%;
+    resize: vertical;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+}
+
+.noteEditor>textarea#noteContent {
+    height: 100%;
+    resize: vertical;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+}
+#editorActions {
+    display: flex;
+    /* width: max-content; */
+    /* margin: auto; */
+    border-radius: 20px;
+    justify-content: space-between;
+    /* align-items: center; */
+    background: var(--bg-3);
+    border-top: 1px solid var(--border);
+}
+#undoredo {
+    display: flex;
+    padding: 0px;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;  
+}
+#undoredo>span {
+    font-size: 32px;
+    border-radius: 40px;
+    background: var(--text);
+    color: var(--inv-text);
+    cursor: pointer;
+}
+
+.newNote {
+    justify-content: center;
+    align-items: center;
+    filter: invert(0.06);
+}
+
+.noteCard {
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 0;
+    padding: 10px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    cursor: pointer;
+    background: var(--bgdt);
+    overflow: hidden;
+}
+
+.noteCard>h3 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.noteCard>p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.noteActions {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0px;
+    width: 100%;
+    height: 15%;
+    filter: invert(0.1);
+    background: var(--bg-2);
+}
+
+.noteActions>button {
+    background: none;
+    border: none;
+    border-radius: 0%;
+}
+
+#pin {
+    width: 20px;
+    position: absolute;
+    right: 20px;
+}
+
+.sidebar>div {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+    border-radius: 20px;
+    margin-left: 0px;
+    cursor: pointer
+}
+
+.sidebar>div:hover:not(.active) {
+    background-color: var(--menu-item-bg-hover);
+}
+
+.sidebar>div>img {
+    width: 20px;
+}
+
+input,
+textarea {
+    border: none;
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 10px;
+    margin: 5px;
+    padding: 10px;
+}
+
+.active {
+    background: var(--menu-item-bg);
+}
+
+button {
+    padding: 5px 10px;
+    /* border-radius: 20px; */
+    border-radius:20px;
+    background: var(--text);
+    color: var(--inv-text);
+    border: 1px solid var(--border);
+    margin: 5px;
+    cursor: pointer;
+}
+
+.overlayContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+    z-index: 999;
+}
+
+.overlayContainer:has(.savedMessage.popup) {
+    width: max-content;
+    height: max-content;
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+}
+
+.dynamic-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background:var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--text);
+    width: 400px;
+    height: 200px;
+}
+.deleteWarning {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background:var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--text);
+    width: 400px;
+    height: 200px;
+}
+
+.closeWarning {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--text);
+    width: 400px;
+    height: 200px;
+}
+
+.savedMessage {
+    display: flex;
+    background: var(--bg-2);
+    border-radius: 20px;
+    border: 1px solid rgb(231, 255, 194);
+    color: var(--inv-text);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 80px;
+    height: 30px;
+}
+.overlay>h3 {
+    margin-bottom: 20px;
+}
+
+
+
+/* Trash */
+.trash{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+.trashActions {
+    display: flex;
+    width: 100%;
+    /* margin: auto; */
+    border-radius: 20px;
+    justify-content: space-evenly;
+    /* align-items: center; */
+    background: var(--bg-3);
+    border-top: 1px solid var(--border);
+}
+.trashContainer {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-gap: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.trashCard{
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 0;
+    padding: 10px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    cursor: pointer;
+    background: var(--bgdt);
+    overflow: hidden;
+}
