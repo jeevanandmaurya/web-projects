@@ -12,7 +12,6 @@ const sidebar = document.querySelector(".sidebar")
 //Event Listeners
 //Theme Toggle
 themeToggle.addEventListener('click', function () {
-    console.log("Theme toggled")
     if (themeContext.getTheme() === "light") {
         themeContext.setTheme("dark");
     } else {
@@ -28,11 +27,8 @@ sidebarToggle.addEventListener('click', function () {
 })
 
 //Sidebar Item Selection
-console.log(sidebarItems);
-
 sidebarItems.forEach(item => {
     item.addEventListener('click', function () {
-        console.log("Sidebar Item Clicked");
         if (item.classList.contains("active")) return;
         sidebarItems.forEach(i => i.classList.remove("active"));
         item.classList.add("active");
@@ -102,7 +98,6 @@ function createNoteObject(id) {
     };
 }
 function createNoteCard(noteId) {
-    console.log("Creating Note Card");
     const noteCard = document.createElement('div');
     const note = mainStorage.readNote(noteId);
     noteCard.className = 'noteCard';
@@ -118,7 +113,6 @@ function createNoteCard(noteId) {
     return noteCard;
 }
 function updateNoteCard(noteId) {
-    console.log("Updating Note Card");
     const noteCard = document.getElementById(noteId);
     const note = mainStorage.readNote(noteId);
     if (note) {
@@ -126,11 +120,9 @@ function updateNoteCard(noteId) {
         noteCard.querySelector('p').innerText = note.content.body;
     } else {
         notesContainer.removeChild(noteCard);
-        console.log(`Note Card(${noteId}) Removed`);
     }
 }
 function loadNotes() {
-    console.log("Loading All Notes in Note list");
     const notesIds = mainStorage.getAllNotesId();
     notesIds.forEach(noteId => {
         const noteCard = createNoteCard(noteId);
@@ -138,7 +130,6 @@ function loadNotes() {
     });
 }
 function renderNote(noteId) {
-    console.log("Rendering Note in Editor");
     const note = mainStorage.readNote(noteId);
     if (note) {
         noteEditor.querySelector('#noteTitle').value = note.content.title;
@@ -146,12 +137,10 @@ function renderNote(noteId) {
     }
 }
 async function renderOverlay(type) {
-    console.log("Rendering Overlay");
     //type: 'deleteWarning', 'closeWarning', 'savedMessage'
     //set display to absolute for corresponding type
     document.querySelector(".overlayContainer").style.display = 'block';
     const overlayBox = document.querySelector(`.${type}`);
-    console.log(overlayBox);
 
     overlayBox.style.display = 'flex';
     if (type !== 'savedMessage') {
@@ -213,10 +202,8 @@ newNote.addEventListener('click', function () {
     mainStorage.createNote(note);
     const noteCard = createNoteCard(noteId);
     notesContainer.append(noteCard);
-    console.log(`New Note(${noteId}) Created`);
     //Open New Note in Editor
     showEditorView(noteId);
-    console.log("Opening New Note in Editor");
 })
 //Note Card Actions
 noteList.addEventListener('click', async function (e) {
@@ -227,24 +214,19 @@ noteList.addEventListener('click', async function (e) {
 
         let confirmation = await renderOverlay('deleteWarning');
         if (confirmation !== "Yes") {
-            console.log(`Deletion of Note(${noteId}) Cancelled`);
             return;
         }
-        console.log("confirmation yes");
         mainStorage.deleteNote(noteId);
         notesContainer.removeChild(document.getElementById(noteId));
         //trashing note card
         const trashCard = createTrashCard(noteId);
         trashContainer.append(trashCard);
-
-        console.log(`Note(${noteId}) Deleted`);
     }
     //Edit Note
     else if (e.target.classList.contains('editBtn')) {
         const noteCard = e.target.closest('.noteCard');
         const noteId = noteCard.id;
         showEditorView(noteId);
-        console.log(`Editing Note(${noteId})`);
     }
 });
 
@@ -263,7 +245,7 @@ noteEditor.addEventListener('click', async function (e) {
         updateNoteCard(noteId);
 
         renderOverlay('savedMessage');
-        console.log(`Note(${noteId}) Updated`);
+
     }
     //Delete Note 
     else if (e.target.classList.contains('deleteBtn')) {
@@ -271,7 +253,7 @@ noteEditor.addEventListener('click', async function (e) {
 
         let confirmation = await renderOverlay('deleteWarning');
         if (confirmation !== "Yes") {
-            console.log(`Deletion of Note(${noteId}) Cancelled`);
+          
             return;
         }
         mainStorage.deleteNote(noteId);
@@ -279,7 +261,7 @@ noteEditor.addEventListener('click', async function (e) {
         //trashing note card
         const trashCard = createTrashCard(noteId);
         trashContainer.append(trashCard);
-        console.log(`Note(${noteId}) Deleted`);
+     
         showListView();
 
     }
@@ -287,15 +269,15 @@ noteEditor.addEventListener('click', async function (e) {
     else if (e.target.classList.contains('closeBtn')) {
         const confirmation = await renderOverlay('closeWarning');
         if (confirmation === "Yes") {
-            console.log("Closing Note Editor");
+            
             // saveChanges();
             showListView();
 
         } else if (confirmation === "No") {
             showListView();
-            console.log("Closing Note Editor");
+          
         } else {
-            console.log("Close Note Editor Cancelled");
+           
         }
     }
 });
@@ -330,7 +312,7 @@ function hideTrashView() {
     return false;
 }
 function loadTrashNotes() {
-    console.log("Loading All Notes in Trash");
+  
     const trashIds = trashStorage.getAllTrashedId();
     trashIds.forEach(trashId => {
         const trashCard = createTrashCard(trashId);
@@ -338,7 +320,7 @@ function loadTrashNotes() {
     });
 }
 function createTrashCard(trashId) {
-    console.log("Creating Trash Card");
+ 
     const trashCard = document.createElement('div');
     const trashedNote = trashStorage.readTrash(trashId);
     trashCard.className = 'trashCard';
@@ -357,22 +339,21 @@ function createTrashCard(trashId) {
 //Event Listeners for Trash Actions
 trashActions.querySelector('.restoreAllBtn').addEventListener('click', async function () {
 
-    console.log("rendering Overlay");
-    
+       
     let confirmation = await renderOverlayNew('Are you sure you want to restore all notes from trash?', [
         { id: 'confirmRestoreAll', label: 'Yes' },
         { id: 'cancelRestoreAll', label: 'No' }
     ]);
     if (confirmation !== "confirmRestoreAll") {
-        console.log("Restore All from Trash Cancelled");
+    
         return;
     }
-    console.log("Restoring All Notes from Trash");
+    
     const trashIds = trashStorage.getAllTrashedId();
     trashIds.forEach(trashId => {
         trashStorage.restore(trashId, mainStorage);
         notesContainer.append(createNoteCard(trashId));
-        console.log(`Restored Note(${trashId}) from Trash`);
+        
     });
     trashContainer.innerHTML = '';
 });
@@ -382,14 +363,13 @@ trashActions.querySelector('.emptyTrashBtn').addEventListener('click', async fun
         { id: 'confirmEmptyTrash', label: 'Yes' },
         { id: 'cancelEmptyTrash', label: 'No' }
     ]);
-    console.log("Emptying Trash");
+  
     if (confirmation !== "confirmEmptyTrash") {
-        console.log("Empty Trash Cancelled");
         return;
     }
     trashStorage.clearAllTrash();
     trashContainer.innerHTML = '';
-    console.log("Trash Emptied");
+  
 });
 
 trashContainer.addEventListener('click', async function (e) {
@@ -402,7 +382,7 @@ trashContainer.addEventListener('click', async function (e) {
         ]);
 
         if (confirmation !== "confirmRestore") {
-            console.log("Restore Cancelled");
+          
             return;
         }
 
@@ -411,7 +391,7 @@ trashContainer.addEventListener('click', async function (e) {
         trashStorage.restore(trashId, mainStorage);
         trashContainer.removeChild(trashCard);
         notesContainer.append(createNoteCard(trashId));
-        console.log(`Restored Note(${trashId}) from Trash`);
+ 
     }
     //Permanent Delete
     else if (e.target.classList.contains('permanentDeleteBtn')) {
@@ -422,7 +402,7 @@ trashContainer.addEventListener('click', async function (e) {
         ]);
 
         if (confirmation !== "confirmPermanentDelete") {
-            console.log("Permanent Delete Cancelled");
+    
             return;
         }
 
@@ -430,7 +410,7 @@ trashContainer.addEventListener('click', async function (e) {
         const trashId = trashCard.id;
         trashStorage.permanentDelete(trashId);
         trashContainer.removeChild(trashCard);
-        console.log(`Permanently Deleted Note(${trashId}) from Trash`);
+
     }
 });
 
