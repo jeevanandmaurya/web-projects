@@ -110,14 +110,14 @@ function createModel() {
 
     // Input Layer: 12 sensors
     model.add(tf.layers.dense({
-        units: 64,
+        units: 32,
         inputShape: [12],
         activation: 'relu'
     }));
 
     // Hidden Layer
     model.add(tf.layers.dense({
-        units: 64,
+        units: 32,
         activation: 'relu'
     }));
 
