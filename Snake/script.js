@@ -8,9 +8,9 @@ var ctx = c.getContext("2d");
 
 
 var aiControlsEnabled = false;
-var gameLoopInterval = 1;
+var gameLoopInterval = 120;
 var gameLoopSkipped = 0;
-var distanceBasedThreshold = 100;
+var distanceBasedThreshold = 0;
 var isModelLoaded = false;
 
 //handle graph
@@ -22,11 +22,11 @@ function drawGraph() {
     const height = graphCanvas.height - padding * 2;
 
     graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
-    
+
     if (scoreArr.length === 0) return;
 
     const maxScore = Math.max(...scoreArr, 1); // Avoid division by zero
-    
+
     // Draw Axes
     graphCtx.strokeStyle = "#ccc";
     graphCtx.beginPath();
@@ -72,7 +72,7 @@ function drawGraph() {
 //Ai Iterations
 function getSensorData(gameState) {
     const head = gameState.snakeBody[0];
-    
+
     const movingLeft = (gameState.direction.x === -1) ? 1 : 0;
     const movingRight = (gameState.direction.x === 1) ? 1 : 0;
     const movingUp = (gameState.direction.y === -1) ? 1 : 0;
@@ -110,13 +110,18 @@ function createModel() {
 
     // Input Layer: 12 sensors
     model.add(tf.layers.dense({
-        units: 24,
+        units: 64,
         inputShape: [12],
         activation: 'relu'
     }));
 
+    // Hidden Layer
+    model.add(tf.layers.dense({
+        units: 64,
+        activation: 'relu'
+    }));
+
     // Output Layer: 4 decisions (Left, Right, Top, Down)
-    //Using Absolute positions for output
     model.add(tf.layers.dense({
         units: 4,
         activation: 'linear' // Linear allows raw scores (Q-values)
@@ -126,14 +131,16 @@ function createModel() {
 }
 createModel();
 // Hyperparameters
-const DISCOUNT_FACTOR = 0.9; // Value of future rewards (0.9 is standard)
+const DISCOUNT_FACTOR = 0.95; // Value of future rewards
+let EPSILON = 0.2; // Start with 20% random moves for exploration
+const EPSILON_MIN = 0.01; // Minimum exploration rate
+const EPSILON_DECAY = 0.995; // Decay rate per iteration
 
 async function trainModel(memory) {
-    if (memory.length < 10) return; // Don't train if game was too short
     document.getElementById("micro-out-div").innerText = "Training on " + memory.length + " steps...";
     const states = memory.map(m => m.state);      // Input: [12 sensors]
     const actions = memory.map(m => m.action);    // Action: 0, 1, 2, or 3
-    const rewards = memory.map(m => m.reward);    // Reward: +10, -10, 0
+    const rewards = memory.map(m => m.reward);    // Reward: Numeric
     const nextStates = memory.map(m => m.nextState); // Next Input: [12 sensors]
     const dones = memory.map(m => m.done);        // Boolean: Did game end?
 
@@ -142,13 +149,8 @@ async function trainModel(memory) {
     const nextStateTensor = tf.tensor2d(nextStates, [nextStates.length, 12]);
 
     // 3. Predict Q-values for Current and Next states
-    // 'tidy' cleans up memory automatically
-    const { currentQ, nextQ } = tf.tidy(() => {
-        return {
-            currentQ: model.predict(stateTensor), // What model thinks NOW
-            nextQ: model.predict(nextStateTensor) // What model thinks of FUTURE
-        };
-    });
+    const currentQ = model.predict(stateTensor);
+    const nextQ = model.predict(nextStateTensor);
 
     // 4. Update the Q-values (The Math)
     // We want: CurrentQ[Action] = Reward + (0.9 * Max(NextQ))
@@ -181,7 +183,7 @@ async function trainModel(memory) {
     const targetTensor = tf.tensor2d(currentQData, [memory.length, 4]);
 
     await model.fit(stateTensor, targetTensor, {
-        epochs: 1, // One pass is enough for simple games
+        epochs: 3, // Multiple passes for better learning
         shuffle: true
     });
 
@@ -191,7 +193,16 @@ async function trainModel(memory) {
     targetTensor.dispose();
     currentQ.dispose();
     nextQ.dispose();
-    document.getElementById("micro-out-div").innerText = "Training Complete";
+    
+    // Log tensor count to monitor memory
+    console.log("Tensors in memory:", tf.memory().numTensors);
+    
+    // Decay epsilon
+    if (EPSILON > EPSILON_MIN) {
+        EPSILON *= EPSILON_DECAY;
+    }
+    
+    document.getElementById("micro-out-div").innerText = "Training Complete (Tensors: " + tf.memory().numTensors + ", ε: " + EPSILON.toFixed(3) + ")";
 }
 
 
@@ -217,7 +228,7 @@ var snakeBlockSize = cWidth / 20;
 var snakeDirection;
 var foodX;
 var foodY;
-var reward;
+var reward=0;
 var action;
 var score;
 const gameState = {
@@ -239,9 +250,15 @@ function startGame() {
     score = 0;
     gameOverFlag = false;
     snakeDirection = { x: 1, y: 0 };
-    snakBody = [{ x: 50, y: 50 }];
-    foodX = Math.floor(Math.random() * (cWidth / snakeBlockSize)) * snakeBlockSize;
-    foodY = Math.floor(Math.random() * (cHeight / snakeBlockSize)) * snakeBlockSize;
+    snakBody = [{ x:snakeBlockSize + Math.floor(Math.random() * 19)*snakeBlockSize, y: snakeBlockSize+ Math.floor(Math.random() * 18)*snakeBlockSize }];
+    spawnFood();
+
+    // Synchronize initial gameState for AI sensors
+    gameState.snakeBody = snakBody.map(segment => ({ x: segment.x, y: segment.y }));
+    gameState.foodPosition = { x: foodX, y: foodY };
+    gameState.direction = { x: snakeDirection.x, y: snakeDirection.y };
+    gameState.score = score;
+    gameState.gameOver = false;
 
     ctx.clearRect(0, 0, cWidth, cHeight);
     drawGrid();
@@ -251,7 +268,8 @@ function startGame() {
 
 function drawGrid() {
     var gridSize = snakeBlockSize;
-    ctx.strokeStyle = "#bfbfbfff";
+    ctx.beginPath(); // Reset path to prevent accumulation
+    ctx.strokeStyle = "#bfbfbf6a";
     for (var x = 0; x <= c.width; x += gridSize) {
         ctx.moveTo(x, 0);
         ctx.lineTo(x, c.height);
@@ -358,47 +376,79 @@ function updateSnakePosition() {
 
 async function gameLoop() {
     ctx.clearRect(0, 0, cWidth, cHeight);
+    
+    // Reset reward at start of each frame
+    reward = 0;
 
     const currentState = getSensorData(gameState);
     const distBefore = Math.abs(foodX - snakBody[0].x) + Math.abs(foodY - snakBody[0].y);
 
     var predictedAction;
     if (aiControlsEnabled) {
-        // Use distance-based if we are below threshold OR if it's the very first iteration of a fresh model
-        const isFreshModelFirstIter = !isModelLoaded && i === 0;
-        if (i < distanceBasedThreshold || isFreshModelFirstIter) {
+       
+        if (i === 0) {
+            // Set predictedAction to current direction (going straight)
+            if (snakeDirection.x === -1) predictedAction = 0;
+            else if (snakeDirection.x === 1) predictedAction = 1;
+            else if (snakeDirection.y === -1) predictedAction = 2;
+            else if (snakeDirection.y === 1) predictedAction = 3;
+           
+        } else if (i < distanceBasedThreshold) {
             // Use distance-based direction
             const targetDir = disanceBasedDirection(snakBody, foodX, foodY, snakeDirection);
             if (targetDir.x === -1) predictedAction = 0;
             else if (targetDir.x === 1) predictedAction = 1;
             else if (targetDir.y === -1) predictedAction = 2;
             else if (targetDir.y === 1) predictedAction = 3;
+            
+            // Apply direction change
+            switch (predictedAction) {
+                case 0: if (snakeDirection.x !== 1) moveLeft(); break;
+                case 1: if (snakeDirection.x !== -1) moveRight(); break;
+                case 2: if (snakeDirection.y !== 1) moveUp(); break;
+                case 3: if (snakeDirection.y !== -1) moveDown(); break;
+            }
         } else {
-            tf.tidy(() => {
-                const inputTensor = tf.tensor2d([currentState], [1, 12]);
-                const prediction = model.predict(inputTensor);
-                predictedAction = prediction.argMax(1).dataSync()[0];
-            });
-        }
-
-        // Map predictedAction to snakeDirection
-        switch (predictedAction) {
-            case 0: if (snakeDirection.x !== 1) moveLeft(); break;
-            case 1: if (snakeDirection.x !== -1) moveRight(); break;
-            case 2: if (snakeDirection.y !== 1) moveUp(); break;
-            case 3: if (snakeDirection.y !== -1) moveDown(); break;
+            // Epsilon-greedy: explore with probability EPSILON, exploit otherwise
+            if (Math.random() < EPSILON) {
+                predictedAction = Math.floor(Math.random() * 4); // Random action
+            } else {
+                tf.tidy(() => {
+                    const inputTensor = tf.tensor2d([currentState], [1, 12]);
+                    const prediction = model.predict(inputTensor);
+                    predictedAction = prediction.argMax(1).dataSync()[0];
+                });
+            }
+            // Apply direction change
+            switch (predictedAction) {
+                case 0: if (snakeDirection.x !== 1) moveLeft(); break;
+                case 1: if (snakeDirection.x !== -1) moveRight(); break;
+                case 2: if (snakeDirection.y !== 1) moveUp(); break;
+                case 3: if (snakeDirection.y !== -1) moveDown(); break;
+            }
         }
     }
 
     updateSnakePosition();
     hnadleCollision();
 
+    // Determine action taken based on snakeDirection
+    let actionTaken;
+    if (snakeDirection.x === -1) actionTaken = 0;
+    else if (snakeDirection.x === 1) actionTaken = 1;
+    else if (snakeDirection.y === -1) actionTaken = 2;
+    else if (snakeDirection.y === 1) actionTaken = 3;
+
     // Calculate reward for moving closer to food
     const distAfter = Math.abs(foodX - snakBody[0].x) + Math.abs(foodY - snakBody[0].y);
     if (!gameOverFlag && reward === 0) {
+        
         reward = (distAfter < distBefore) ? 1 : -1; // Small reward for moving closer, penalty for moving away
+        
     }
     if (gameOverFlag) reward = -10;
+
+    // console.log("Reward this frame:", reward, "GameOver:", gameOverFlag);
 
     // Update game state for next sensor reading
     gameState.snakeBody = snakBody.map(segment => ({ x: segment.x, y: segment.y }));
@@ -408,13 +458,6 @@ async function gameLoop() {
     gameState.gameOver = gameOverFlag;
 
     const nextState = getSensorData(gameState);
-
-    // Determine action taken based on snakeDirection
-    let actionTaken;
-    if (snakeDirection.x === -1) actionTaken = 0;
-    else if (snakeDirection.x === 1) actionTaken = 1;
-    else if (snakeDirection.y === -1) actionTaken = 2;
-    else if (snakeDirection.y === 1) actionTaken = 3;
 
     // AI Memory Storage
     gameMemory.push({
@@ -430,16 +473,16 @@ async function gameLoop() {
         return;
     }
 
-    // Rendering logic
-    if (gameLoopInterval < 10) {
-        gameLoopSkipped++;
-        if (gameLoopSkipped >= Math.floor(10 / gameLoopInterval)) {
-            gameLoopSkipped = 0;
-            drawGrid(); drawSnake(); drawFood(); drawScore();
-        }
-    } else {
-        drawGrid(); drawSnake(); drawFood(); drawScore();
-    }
+    // // Rendering logic
+    // if (gameLoopInterval < 10) {
+    //     gameLoopSkipped++;
+    //     if (gameLoopSkipped >= Math.floor(10 / gameLoopInterval)) {
+    //         gameLoopSkipped = 0;
+    //         drawGrid(); drawSnake(); drawFood(); drawScore();
+    //     }
+    // } else {
+    // }
+    drawGrid(); drawSnake(); drawFood(); drawScore();
 }
 
 function hnadleCollision() {
@@ -449,13 +492,10 @@ function hnadleCollision() {
     }
     //Food collision logic to be added here
     if (snakBody[0].x === foodX && snakBody[0].y === foodY) {
-        reward = 10;
-        score += 10;
+        reward += 10;
+        score += 1;
         increaseSnakeLength();
-        foodX = Math.floor(Math.random() * (cWidth / snakeBlockSize)) * snakeBlockSize;
-        foodY = Math.floor(Math.random() * (cHeight / snakeBlockSize)) * snakeBlockSize;
-    } else {
-        reward = 0;
+        spawnFood();
     }
     //Self collision
     if (snakBody.length < 5) return;
@@ -464,6 +504,31 @@ function hnadleCollision() {
             gameOverFlag = true;
             gameOver();
         }
+    }
+}
+
+function spawnFood() {
+    // Build a set of occupied positions for O(1) lookup
+    const occupied = new Set();
+    for (let segment of snakBody) {
+        occupied.add(`${segment.x},${segment.y}`);
+    }
+    
+    // Collect all valid (unoccupied) positions
+    const validPositions = [];
+    for (let x = 0; x < cWidth; x += snakeBlockSize) {
+        for (let y = 0; y < cHeight; y += snakeBlockSize) {
+            if (!occupied.has(`${x},${y}`)) {
+                validPositions.push({ x, y });
+            }
+        }
+    }
+    
+    // Pick a random valid position
+    if (validPositions.length > 0) {
+        const pos = validPositions[Math.floor(Math.random() * validPositions.length)];
+        foodX = pos.x;
+        foodY = pos.y;
     }
 }
 
@@ -512,10 +577,10 @@ function disanceBasedDirection(snakeBody, foodX, foodY, currentDirection) {
     for (let move of preferredMoves) {
         let nextX = head.x + move.x * snakeBlockSize;
         let nextY = head.y + move.y * snakeBlockSize;
-        
+
         // Wall check
         if (nextX < 0 || nextX >= cWidth || nextY < 0 || nextY >= cHeight) continue;
-        
+
         // Body check
         let bodyCollision = false;
         for (let segment of snakeBody) {
@@ -542,7 +607,7 @@ var stopAiFlag = false;
 function updateSpeed(val) {
     gameLoopInterval = parseInt(val);
     document.getElementById("speedValue").innerText = val + "ms";
-    
+
     // If AI is running, we need to restart the interval to apply the new speed
     if (aiControlsEnabled && !stopAiFlag && aiIntervalId) {
         clearInterval(aiIntervalId);
@@ -563,10 +628,10 @@ async function startAiInterval() {
         } else {
             clearInterval(aiIntervalId);
             if (stopAiFlag) return;
-            
+
             await trainModel(gameMemory);
             gameMemory = []; // Clear memory after training
-            
+
             i++;
             runAiIterations();
         }
@@ -578,6 +643,11 @@ async function runAiIterations() {
     stopAiFlag = false;
     document.getElementById("micro-out-div").innerText = "AI Running...";
     if (i >= n || stopAiFlag) {
+        // Auto-save model after all iterations complete
+        if (i >= n) {
+            await saveModel();
+            document.getElementById("micro-out-div").innerText = "Training Complete! Model Auto-Saved.";
+        }
         return;
     }
     drawGraph();
@@ -609,7 +679,7 @@ async function loadModel() {
         model.compile({ optimizer: 'adam', loss: 'meanSquaredError' });
         isModelLoaded = true;
         document.getElementById("micro-out-div").innerText = "Model Loaded from IndexedDB";
-        
+
         // Suggest disabling distance-based iterations for loaded models
         document.getElementById("distIterRange").value = 0;
         updateDistIter(0);
@@ -639,13 +709,13 @@ function runUserGameLoop() {
     stopAi();
     aiControlsEnabled = false;
     document.getElementById("micro-out-div").innerText = "User Playing";
-    
+
     // Set speed to a playable default for users if it's too fast
     if (gameLoopInterval < 50) {
         updateSpeed(120);
         document.getElementById("speedRange").value = 120;
     }
-    
+
     startGame();
     var userIntervalId = setInterval(() => {
         if (gameOverFlag || aiControlsEnabled) {
